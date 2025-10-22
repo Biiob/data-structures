@@ -2,6 +2,12 @@
 
 #include <memory>
 
+void log(const std::string& message)
+{
+    FILE* logFile = fopen("stdout.log", "a");
+    fprintf(logFile, "%s\n", message.c_str());
+    fclose(logFile);
+}
 namespace ds
 {
 
@@ -20,12 +26,12 @@ class LinkedList
 
     void clear()
     {
-        head.reset(nullptr);
+        head.reset();
     }
 
-    void insertFront(const T& data)
+    void pushFront(const T& data)
     {
-        head = std::make_shared<Node>(data, head);  
+        head = std::make_shared<Node>(data, head);
     }
 
     T popFront()
@@ -56,10 +62,8 @@ class LinkedList
     {
         public:
         Node(const T& iData, std::shared_ptr<Node> iNext)
-            : data(iData), next(std::move(iNext));
+            : data(iData), next(std::move(iNext))
         {
-            data = iData;
-            next = iNext;
         }
         T data;
         std::shared_ptr<Node> next;    

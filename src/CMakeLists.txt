@@ -1,0 +1,2 @@
+add_library(DataStructure INTERFACE)
+target_include_directories(DataStructure INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
