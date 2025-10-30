@@ -2,22 +2,76 @@
 
 #include <memory>
 
-void log(const std::string& message)
-{
-    FILE* logFile = fopen("stdout.log", "a");
-    fprintf(logFile, "%s\n", message.c_str());
-    fclose(logFile);
-}
 namespace ds
 {
 
 template<class T>
 class LinkedList
 {
+    private:
+
+    class Node
+    {
+        public:
+        Node(const T& iData, std::unique_ptr<Node> iNext)
+            : data(iData), next(std::move(iNext))
+        {}
+        T data;
+        std::unique_ptr<Node> next;    
+
+        friend class Iterator;
+    };
+
+    std::unique_ptr<Node> head;
+    Node* tail = nullptr;
+
+
     public:
 
     LinkedList() = default;
     ~LinkedList() = default;
+
+    LinkedList(const LinkedList<T>& other)
+    {
+        for(Iterator it = other.begin(); it != other.end(); it++)
+        {
+            pushBack(*it);
+        }
+    }
+
+    LinkedList<T>& operator=(const LinkedList<T>& other)
+    {
+        if(this != &other)
+        {
+            clear();
+            for(Iterator it = other.begin(); it != other.end(); it++)
+            {
+                pushBack(*it);
+            }
+        }
+
+        return *this;
+    }
+
+    LinkedList(LinkedList<T>&& other) noexcept
+        : head(std::move(other.head)), 
+          tail(other.tail)
+    {
+        other.tail = nullptr;
+    }
+
+    LinkedList<T>& operator=(LinkedList<T>&& other) noexcept
+    {
+        if(this != &other)
+        {
+            clear();
+            head = std::move(other.head);
+            tail = other.tail;
+            other.tail = nullptr;
+        }
+
+        return *this;
+    }
 
     bool isEmpty() const
     {
@@ -27,11 +81,34 @@ class LinkedList
     void clear()
     {
         head.reset();
+        tail = nullptr;
     }
 
     void pushFront(const T& data)
     {
-        head = std::make_shared<Node>(data, head);
+        auto newNode = std::make_unique<Node>(data, std::move(head));
+        head = std::move(newNode);
+
+        if(!tail)
+        {
+            tail = head.get();
+        }
+    }
+
+    void pushBack(const T& data)
+    {
+        auto newNode = std::make_unique<Node>(data, nullptr);
+
+        if(!head)
+        {
+            head = std::move(newNode);
+            tail = head.get();
+        }
+        else
+        {
+            tail->next = std::move(newNode);
+            tail = tail->next.get();
+        }
     }
 
     T popFront()
@@ -41,12 +118,47 @@ class LinkedList
             throw std::runtime_error("Method popFront() called on an empty list");
         }
 
-        T data = head->data;
-        head = head->next;
-        return data;
+        T data = std::move(head->data);
+        std::unique_ptr<Node> oldHead = std::move(head);
+        head = std::move(oldHead->next);
+        
+        if(!head)
+        {
+            tail = nullptr;
+        }
+
+        return std::move(data);
     }
 
-    T getFront() const
+    T popBack()
+    {
+        if(!head)
+        {
+            throw std::runtime_error("Method popBack() called on an empty list");
+        }
+
+        T data = std::move(tail->data);
+
+        if(head.get() == tail)
+        {
+            head.reset();
+            tail = nullptr;
+
+            return data;
+        }
+ 
+        Node* it = head.get();
+        while(it->next.get() != tail)
+        {
+            it = it->next.get();
+        }
+        it->next.reset();
+        tail = it;
+
+        return std::move(data);
+    }
+
+    T& getFront() const
     {
         if(!head)
         {
@@ -56,20 +168,76 @@ class LinkedList
         return head->data;
     }
 
-    private:
+    T& getBack() const
+    {
+        if(!head)
+        {
+            throw std::runtime_error("Method getBack() called on an empty list");
+        }
 
-    class Node
+        return tail->data;
+    }
+
+    class Iterator
     {
         public:
-        Node(const T& iData, std::shared_ptr<Node> iNext)
-            : data(iData), next(std::move(iNext))
+
+        T& operator*() const
         {
+            return currentNode->data;
         }
-        T data;
-        std::shared_ptr<Node> next;    
+        T* operator->() const
+        {
+            return &currentNode->data;
+        }
+        bool operator==(const Iterator& other) const
+        {
+            return currentNode == other.currentNode;
+        }
+        bool operator!=(const Iterator& other) const
+        {
+            return currentNode != other.currentNode;
+        }
+        Iterator& operator++()
+        {
+            currentNode = currentNode->next.get();
+            return *this;
+        }
+        Iterator operator++(int)
+        {
+            Iterator tmp(*this);
+            ++(*this);
+            return tmp;
+        }
+
+        private:
+
+        explicit Iterator(Node* node) : currentNode(node) {}
+
+        Node* currentNode;
+
+        friend class LinkedList;
     };
 
-    std::shared_ptr<Node> head;
+    Iterator begin()
+    {
+        return Iterator(head.get());
+    }
+
+    Iterator end()
+    {
+        return Iterator(nullptr);
+    }
+
+    const Iterator begin() const
+    {
+        return Iterator(head.get());
+    }
+
+    const Iterator end() const
+    {
+        return Iterator(nullptr);
+    }
 };
 
 }
