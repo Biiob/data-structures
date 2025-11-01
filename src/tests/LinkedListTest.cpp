@@ -4,7 +4,8 @@
 
 using ds::LinkedList;
 
-class LinkedListTest : public ::testing::Test {
+class LinkedListTest : public ::testing::Test 
+{
 protected:
     LinkedList<int> list;
 };

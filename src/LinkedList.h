@@ -5,7 +5,7 @@
 namespace ds
 {
 
-template<class T>
+template<typename T>
 class LinkedList
 {
     private:
