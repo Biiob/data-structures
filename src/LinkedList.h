@@ -5,19 +5,17 @@
 namespace ds
 {
 
-template<typename T>
-class LinkedList
+template <typename T> class LinkedList
 {
-    private:
-
+  private:
     class Node
     {
-        public:
-        Node(const T& iData, std::unique_ptr<Node> iNext)
-            : data(iData), next(std::move(iNext))
-        {}
+      public:
+        Node(const T& iData, std::unique_ptr<Node> iNext) : data(iData), next(std::move(iNext))
+        {
+        }
         T data;
-        std::unique_ptr<Node> next;    
+        std::unique_ptr<Node> next;
 
         friend class Iterator;
     };
@@ -25,15 +23,13 @@ class LinkedList
     std::unique_ptr<Node> head;
     Node* tail = nullptr;
 
-
-    public:
-
+  public:
     LinkedList() = default;
     ~LinkedList() = default;
 
     LinkedList(const LinkedList<T>& other)
     {
-        for(Iterator it = other.begin(); it != other.end(); it++)
+        for (Iterator it = other.begin(); it != other.end(); it++)
         {
             pushBack(*it);
         }
@@ -41,10 +37,10 @@ class LinkedList
 
     LinkedList<T>& operator=(const LinkedList<T>& other)
     {
-        if(this != &other)
+        if (this != &other)
         {
             clear();
-            for(Iterator it = other.begin(); it != other.end(); it++)
+            for (Iterator it = other.begin(); it != other.end(); it++)
             {
                 pushBack(*it);
             }
@@ -53,16 +49,14 @@ class LinkedList
         return *this;
     }
 
-    LinkedList(LinkedList<T>&& other) noexcept
-        : head(std::move(other.head)), 
-          tail(other.tail)
+    LinkedList(LinkedList<T>&& other) noexcept : head(std::move(other.head)), tail(other.tail)
     {
         other.tail = nullptr;
     }
 
     LinkedList<T>& operator=(LinkedList<T>&& other) noexcept
     {
-        if(this != &other)
+        if (this != &other)
         {
             clear();
             head = std::move(other.head);
@@ -89,7 +83,7 @@ class LinkedList
         auto newNode = std::make_unique<Node>(data, std::move(head));
         head = std::move(newNode);
 
-        if(!tail)
+        if (!tail)
         {
             tail = head.get();
         }
@@ -99,7 +93,7 @@ class LinkedList
     {
         auto newNode = std::make_unique<Node>(data, nullptr);
 
-        if(!head)
+        if (!head)
         {
             head = std::move(newNode);
             tail = head.get();
@@ -113,7 +107,7 @@ class LinkedList
 
     T popFront()
     {
-        if(!head)
+        if (!head)
         {
             throw std::runtime_error("Method popFront() called on an empty list");
         }
@@ -121,8 +115,8 @@ class LinkedList
         T data = std::move(head->data);
         std::unique_ptr<Node> oldHead = std::move(head);
         head = std::move(oldHead->next);
-        
-        if(!head)
+
+        if (!head)
         {
             tail = nullptr;
         }
@@ -132,23 +126,23 @@ class LinkedList
 
     T popBack()
     {
-        if(!head)
+        if (!head)
         {
             throw std::runtime_error("Method popBack() called on an empty list");
         }
 
         T data = std::move(tail->data);
 
-        if(head.get() == tail)
+        if (head.get() == tail)
         {
             head.reset();
             tail = nullptr;
 
             return data;
         }
- 
+
         Node* it = head.get();
-        while(it->next.get() != tail)
+        while (it->next.get() != tail)
         {
             it = it->next.get();
         }
@@ -160,7 +154,7 @@ class LinkedList
 
     T& getFront() const
     {
-        if(!head)
+        if (!head)
         {
             throw std::runtime_error("Method getFront() called on an empty list");
         }
@@ -170,7 +164,7 @@ class LinkedList
 
     T& getBack() const
     {
-        if(!head)
+        if (!head)
         {
             throw std::runtime_error("Method getBack() called on an empty list");
         }
@@ -180,8 +174,7 @@ class LinkedList
 
     class Iterator
     {
-        public:
-
+      public:
         T& operator*() const
         {
             return currentNode->data;
@@ -210,9 +203,10 @@ class LinkedList
             return tmp;
         }
 
-        private:
-
-        explicit Iterator(Node* node) : currentNode(node) {}
+      private:
+        explicit Iterator(Node* node) : currentNode(node)
+        {
+        }
 
         Node* currentNode;
 
@@ -240,4 +234,4 @@ class LinkedList
     }
 };
 
-}
+} // namespace ds

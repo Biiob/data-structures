@@ -4,9 +4,9 @@
 
 using ds::LinkedList;
 
-class LinkedListTest : public ::testing::Test 
+class LinkedListTest : public ::testing::Test
 {
-protected:
+  protected:
     LinkedList<int> list;
 };
 
@@ -59,9 +59,9 @@ TEST_F(LinkedListTest, MoveConstructor_WhenSourceHasElements_ShouldTransferOwner
     EXPECT_EQ(movedList.popFront(), 1);
     EXPECT_TRUE(movedList.isEmpty());
     EXPECT_TRUE(list.isEmpty());
-
 }
-TEST_F(LinkedListTest, MoveAssignmentOperator_WhenSourceHasElements_ShouldTransferOwnershipAndClearSource)
+TEST_F(LinkedListTest,
+       MoveAssignmentOperator_WhenSourceHasElements_ShouldTransferOwnershipAndClearSource)
 {
     list.pushBack(0);
     list.pushBack(1);
@@ -246,13 +246,13 @@ TEST_F(LinkedListTest, IteratorComparison_WhenAtDifferentPositions_ShouldBeNotEq
 }
 TEST_F(LinkedListTest, RangeBasedFor_WhenIterating_ShouldVisitAllElementsInOrder)
 {
-    for(int i = 0; i < 5; i++)
+    for (int i = 0; i < 5; i++)
     {
         list.pushBack(i);
     }
 
     int i = 0;
-    for(auto it : list)
+    for (auto it : list)
     {
         EXPECT_EQ(it, i);
         i++;

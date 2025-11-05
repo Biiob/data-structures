@@ -5,26 +5,23 @@
 namespace ds
 {
 
-template<typename T>
-class Array
+template <typename T> class Array
 {
-private:
+  private:
     constexpr static size_t DEFAULT_SIZE = 32;
+    std::unique_ptr<T[]> array;
     size_t count = 0;
     size_t currentCapacity = 0;
-    std::unique_ptr<T[]> array;
 
-public:
-
+  public:
     Array() = default;
     ~Array() = default;
 
     Array(const Array<T>& other)
-        : array(std::make_unique<T[]>(other.currentCapacity)),
-          count(other.count),
+        : array(std::make_unique<T[]>(other.currentCapacity)), count(other.count),
           currentCapacity(other.currentCapacity)
     {
-        for(size_t i = 0; i < other.size(); i++)
+        for (size_t i = 0; i < other.size(); i++)
         {
             array[i] = other[i];
         }
@@ -32,12 +29,12 @@ public:
 
     Array<T>& operator=(const Array<T>& other)
     {
-        if(this != &other)
+        if (this != &other)
         {
             array = std::make_unique<T[]>(other.currentCapacity);
             count = other.count;
             currentCapacity = other.currentCapacity;
-            for(size_t i = 0; i < other.size(); i++)
+            for (size_t i = 0; i < other.size(); i++)
             {
                 array[i] = other[i];
             }
@@ -46,16 +43,14 @@ public:
     }
 
     Array(Array<T>&& other) noexcept
-        : array(std::move(other.array)),
-          currentCapacity(other.currentCapacity),
-          count(other.count)
+        : array(std::move(other.array)), count(other.count), currentCapacity(other.currentCapacity)
     {
         other.count = 0;
         other.currentCapacity = 0;
     }
     Array<T>& operator=(Array<T>&& other) noexcept
     {
-        if(this != &other)
+        if (this != &other)
         {
             array = std::move(other.array);
             count = other.count;
@@ -66,14 +61,14 @@ public:
         return *this;
     }
 
-    T& operator[](size_t i)
+    T& operator[](size_t i) const
     {
         return array[i];
     }
 
-    T& at(size_t i)
+    T& at(size_t i) const
     {
-        if(i >= count)
+        if (i >= count)
         {
             throw std::out_of_range("Out of bounds in at() method");
         }
@@ -97,12 +92,12 @@ public:
 
     void reserve(size_t newCapacity)
     {
-        if(newCapacity <= currentCapacity)
+        if (newCapacity <= currentCapacity)
         {
             return;
         }
         auto newArray = std::make_unique<T[]>(newCapacity);
-        for(size_t i = 0; i < count; i++)
+        for (size_t i = 0; i < count; i++)
         {
             newArray[i] = std::move(array[i]);
         }
@@ -117,7 +112,7 @@ public:
 
     void pushBack(const T& data)
     {
-        if(count == currentCapacity)
+        if (count == currentCapacity)
         {
             reserve(currentCapacity == 0 ? DEFAULT_SIZE : currentCapacity * 2);
         }
@@ -126,7 +121,7 @@ public:
 
     T popBack()
     {
-        if(count == 0)
+        if (count == 0)
         {
             throw std::runtime_error("Method popBack() called on an empty array");
         }
@@ -135,4 +130,4 @@ public:
         return data;
     }
 };
-}
+} // namespace ds
