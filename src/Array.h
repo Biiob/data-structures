@@ -130,5 +130,97 @@ template <typename T> class Array
         T data = std::move(array[--count]);
         return data;
     }
+
+    class Iterator
+    {
+      public:
+        T& operator*() const
+        {
+            return *data;
+        }
+        T* operator->() const
+        {
+            return data;
+        }
+        bool operator==(const Iterator& other) const
+        {
+            return data == other.data;
+        }
+        bool operator!=(const Iterator& other) const
+        {
+            return data != other.data;
+        }
+        Iterator& operator++()
+        {
+            data++;
+            return *this;
+        }
+        Iterator operator++(int)
+        {
+            Iterator tmp(*this);
+            ++(*this);
+            return tmp;
+        }
+        Iterator& operator--()
+        {
+            data--;
+            return *this;
+        }
+        Iterator operator--(int)
+        {
+            Iterator tmp(*this);
+            --(*this);
+            return tmp;
+        }
+
+      private:
+        explicit Iterator(T* iData) : data(iData)
+        {
+        }
+
+        T* data;
+
+        friend class Array;
+    };
+
+    Iterator begin()
+    {
+        return Iterator(array.get());
+    }
+
+    Iterator end()
+    {
+        return Iterator(array.get() + count);
+    }
+
+    const Iterator begin() const
+    {
+        return Iterator(array.get());
+    }
+
+    const Iterator end() const
+    {
+        return Iterator(array.get() + count);
+    }
+
+    Iterator rbegin()
+    {
+        return Iterator(array.get() + count - 1);
+    }
+
+    Iterator rend()
+    {
+        return Iterator(array.get() - 1);
+    }
+
+    const Iterator rbegin() const
+    {
+        return Iterator(array.get() + count - 1);
+    }
+
+    const Iterator rend() const
+    {
+        return Iterator(array.get() - 1);
+    }
 };
 } // namespace ds

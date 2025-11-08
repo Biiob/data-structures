@@ -189,3 +189,32 @@ TEST_F(ArrayTest, PopBack_WhenArrayHasMultipleElements_ShouldRemoveLast)
     EXPECT_EQ(array.popBack(), 1);
     EXPECT_EQ(array[0], 0);
 }
+
+// --- Iterators ---
+TEST_F(ArrayTest, IteratorLoop_WhenIterating_ShouldVisitAllElementsInOrder)
+{
+    for (int i = 0; i < 5; i++)
+    {
+        array.pushBack(i);
+    }
+
+    int i = 0;
+    for (auto it = array.begin(); it != array.end(); it++, i++)
+    {
+        EXPECT_EQ(*it, i);
+    }
+}
+
+TEST_F(ArrayTest, IteratorLoop_WhenReverseIterating_ShouldVisitAllElementsInReverseOrder)
+{
+    for (int i = 0; i < 5; i++)
+    {
+        array.pushBack(i);
+    }
+
+    int i = 4;
+    for (auto it = array.rbegin(); it != array.rend(); it--, i--)
+    {
+        EXPECT_EQ(*it, i);
+    }
+}
