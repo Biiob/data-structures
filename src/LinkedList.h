@@ -6,17 +6,20 @@
 namespace ds
 {
 
-template <typename T> class LinkedList
+template <typename T>
+class LinkedList
 {
   private:
     class Node
     {
       public:
-        Node(const T& iData, std::unique_ptr<Node> iNext) : data(iData), next(std::move(iNext))
-        {
-        }
         T data;
         std::unique_ptr<Node> next;
+
+        explicit Node(const T& iData, std::unique_ptr<Node> iNext)
+            : data(iData), next(std::move(iNext))
+        {
+        }
 
         friend class Iterator;
     };

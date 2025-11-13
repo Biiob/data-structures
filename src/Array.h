@@ -6,7 +6,8 @@
 namespace ds
 {
 
-template <typename T> class Array
+template <typename T>
+class Array
 {
   private:
     constexpr static size_t DEFAULT_SIZE = 32;

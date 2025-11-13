@@ -7,7 +7,8 @@
 
 namespace ds
 {
-template <class T> class Stack
+template <typename T>
+class Stack
 {
   private:
     class Node
@@ -16,7 +17,8 @@ template <class T> class Stack
         T data;
         std::unique_ptr<Node> next;
 
-        Node(const T& iData, std::unique_ptr<Node> iNext) : data(iData), next(std::move(iNext))
+        explicit Node(const T& iData, std::unique_ptr<Node> iNext)
+            : data(iData), next(std::move(iNext))
         {
         }
 
