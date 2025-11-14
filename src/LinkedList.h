@@ -125,7 +125,7 @@ class LinkedList
             tail = nullptr;
         }
 
-        return std::move(data);
+        return data;
     }
 
     T popBack()
@@ -153,7 +153,7 @@ class LinkedList
         it->next.reset();
         tail = it;
 
-        return std::move(data);
+        return data;
     }
 
     T& getFront() const
