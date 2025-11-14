@@ -9,15 +9,10 @@ namespace ds
 template <typename T>
 class Array
 {
-  private:
-    constexpr static size_t DEFAULT_SIZE = 32;
-    std::unique_ptr<T[]> array;
-    size_t count = 0;
-    size_t currentCapacity = 0;
-
   public:
+    class Iterator;
+
     Array() = default;
-    ~Array() = default;
 
     Array(const Array<T>& other)
         : array(std::make_unique<T[]>(other.currentCapacity)), count(other.count),
@@ -27,6 +22,13 @@ class Array
         {
             array[i] = other[i];
         }
+    }
+
+    Array(Array<T>&& other) noexcept
+        : array(std::move(other.array)), count(other.count), currentCapacity(other.currentCapacity)
+    {
+        other.count = 0;
+        other.currentCapacity = 0;
     }
 
     Array<T>& operator=(const Array<T>& other)
@@ -44,12 +46,6 @@ class Array
         return *this;
     }
 
-    Array(Array<T>&& other) noexcept
-        : array(std::move(other.array)), count(other.count), currentCapacity(other.currentCapacity)
-    {
-        other.count = 0;
-        other.currentCapacity = 0;
-    }
     Array<T>& operator=(Array<T>&& other) noexcept
     {
         if (this != &other)
@@ -62,6 +58,8 @@ class Array
         }
         return *this;
     }
+
+    ~Array() = default;
 
     T& operator[](size_t i) const
     {
@@ -132,96 +130,83 @@ class Array
         return data;
     }
 
-    class Iterator
-    {
-      public:
-        T& operator*() const
-        {
-            return *data;
-        }
-        T* operator->() const
-        {
-            return data;
-        }
-        bool operator==(const Iterator& other) const
-        {
-            return data == other.data;
-        }
-        bool operator!=(const Iterator& other) const
-        {
-            return data != other.data;
-        }
-        Iterator& operator++()
-        {
-            data++;
-            return *this;
-        }
-        Iterator operator++(int)
-        {
-            Iterator tmp(*this);
-            ++(*this);
-            return tmp;
-        }
-        Iterator& operator--()
-        {
-            data--;
-            return *this;
-        }
-        Iterator operator--(int)
-        {
-            Iterator tmp(*this);
-            --(*this);
-            return tmp;
-        }
-
-      private:
-        explicit Iterator(T* iData) : data(iData)
-        {
-        }
-
-        T* data;
-
-        friend class Array;
-    };
-
-    Iterator begin()
+    Iterator begin() const
     {
         return Iterator(array.get());
     }
 
-    Iterator end()
+    Iterator end() const
     {
         return Iterator(array.get() + count);
     }
 
-    const Iterator begin() const
-    {
-        return Iterator(array.get());
-    }
-
-    const Iterator end() const
-    {
-        return Iterator(array.get() + count);
-    }
-
-    Iterator rbegin()
+    Iterator rbegin() const
     {
         return Iterator(array.get() + count - 1);
     }
 
-    Iterator rend()
+    Iterator rend() const
     {
         return Iterator(array.get() - 1);
     }
 
-    const Iterator rbegin() const
+  private:
+    constexpr static size_t DEFAULT_SIZE = 32;
+    std::unique_ptr<T[]> array;
+    size_t count = 0;
+    size_t currentCapacity = 0;
+};
+
+template <typename T>
+class Array<T>::Iterator
+{
+  public:
+    const T& operator*() const
     {
-        return Iterator(array.get() + count - 1);
+        return *data;
+    }
+    const T* operator->() const
+    {
+        return data;
+    }
+    bool operator==(const Iterator& other) const
+    {
+        return data == other.data;
+    }
+    bool operator!=(const Iterator& other) const
+    {
+        return data != other.data;
+    }
+    Iterator& operator++()
+    {
+        data++;
+        return *this;
+    }
+    Iterator operator++(int)
+    {
+        Iterator tmp(*this);
+        ++(*this);
+        return tmp;
+    }
+    Iterator& operator--()
+    {
+        data--;
+        return *this;
+    }
+    Iterator operator--(int)
+    {
+        Iterator tmp(*this);
+        --(*this);
+        return tmp;
     }
 
-    const Iterator rend() const
+  private:
+    explicit Iterator(T* iData) : data(iData)
     {
-        return Iterator(array.get() - 1);
     }
+
+    T* data;
+
+    friend class Array;
 };
 } // namespace ds

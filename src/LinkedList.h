@@ -9,27 +9,10 @@ namespace ds
 template <typename T>
 class LinkedList
 {
-  private:
-    class Node
-    {
-      public:
-        T data;
-        std::unique_ptr<Node> next;
-
-        explicit Node(const T& iData, std::unique_ptr<Node> iNext)
-            : data(iData), next(std::move(iNext))
-        {
-        }
-
-        friend class Iterator;
-    };
-
-    std::unique_ptr<Node> head;
-    Node* tail = nullptr;
-
   public:
+    class Iterator;
+
     LinkedList() = default;
-    ~LinkedList() = default;
 
     LinkedList(const LinkedList<T>& other)
     {
@@ -37,6 +20,11 @@ class LinkedList
         {
             pushBack(*it);
         }
+    }
+
+    LinkedList(LinkedList<T>&& other) noexcept : head(std::move(other.head)), tail(other.tail)
+    {
+        other.tail = nullptr;
     }
 
     LinkedList<T>& operator=(const LinkedList<T>& other)
@@ -53,11 +41,6 @@ class LinkedList
         return *this;
     }
 
-    LinkedList(LinkedList<T>&& other) noexcept : head(std::move(other.head)), tail(other.tail)
-    {
-        other.tail = nullptr;
-    }
-
     LinkedList<T>& operator=(LinkedList<T>&& other) noexcept
     {
         if (this != &other)
@@ -70,6 +53,8 @@ class LinkedList
 
         return *this;
     }
+
+    ~LinkedList() = default;
 
     bool isEmpty() const
     {
@@ -176,66 +161,72 @@ class LinkedList
         return tail->data;
     }
 
-    class Iterator
+    Iterator begin() const
+    {
+        return Iterator(head.get());
+    }
+
+    Iterator end() const
+    {
+        return Iterator(nullptr);
+    }
+
+  private:
+    class Node
     {
       public:
-        T& operator*() const
-        {
-            return currentNode->data;
-        }
-        T* operator->() const
-        {
-            return &currentNode->data;
-        }
-        bool operator==(const Iterator& other) const
-        {
-            return currentNode == other.currentNode;
-        }
-        bool operator!=(const Iterator& other) const
-        {
-            return currentNode != other.currentNode;
-        }
-        Iterator& operator++()
-        {
-            currentNode = currentNode->next.get();
-            return *this;
-        }
-        Iterator operator++(int)
-        {
-            Iterator tmp(*this);
-            ++(*this);
-            return tmp;
-        }
-
-      private:
-        explicit Iterator(Node* node) : currentNode(node)
+        explicit Node(const T& iData, std::unique_ptr<Node> iNext)
+            : data(iData), next(std::move(iNext))
         {
         }
 
-        Node* currentNode;
-
-        friend class LinkedList;
+        T data;
+        std::unique_ptr<Node> next;
     };
 
-    Iterator begin()
-    {
-        return Iterator(head.get());
-    }
-
-    Iterator end()
-    {
-        return Iterator(nullptr);
-    }
-
-    const Iterator begin() const
-    {
-        return Iterator(head.get());
-    }
-
-    const Iterator end() const
-    {
-        return Iterator(nullptr);
-    }
+    std::unique_ptr<Node> head;
+    Node* tail = nullptr;
 };
 
+template <typename T>
+class LinkedList<T>::Iterator
+{
+  public:
+    const T& operator*() const
+    {
+        return currentNode->data;
+    }
+    const T* operator->() const
+    {
+        return &currentNode->data;
+    }
+    bool operator==(const Iterator& other) const
+    {
+        return currentNode == other.currentNode;
+    }
+    bool operator!=(const Iterator& other) const
+    {
+        return currentNode != other.currentNode;
+    }
+    Iterator& operator++()
+    {
+        currentNode = currentNode->next.get();
+        return *this;
+    }
+    Iterator operator++(int)
+    {
+        Iterator tmp(*this);
+        ++(*this);
+        return tmp;
+    }
+
+  private:
+    explicit Iterator(Node* node) : currentNode(node)
+    {
+    }
+
+    Node* currentNode;
+
+    friend class LinkedList;
+};
 } // namespace ds
