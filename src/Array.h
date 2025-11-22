@@ -11,6 +11,7 @@ class Array
 {
   public:
     class Iterator;
+    class ConstIterator;
 
     Array() = default;
 
@@ -61,6 +62,15 @@ class Array
 
     ~Array() = default;
 
+    void swap(Array<T>& other) noexcept
+    {
+        using std::swap;
+
+        swap(array, other.array);
+        swap(count, other.count);
+        swap(currentCapacity, other.currentCapacity);
+    }
+
     T& operator[](size_t i) const
     {
         return array[i];
@@ -105,6 +115,27 @@ class Array
         currentCapacity = newCapacity;
     }
 
+    void resize(size_t newSize)
+    {
+        if (newSize <= currentCapacity)
+        {
+            count = newSize;
+            return;
+        }
+
+        if (newSize > currentCapacity)
+        {
+            reserve(newSize);
+        }
+
+        for (size_t i = count; i < newSize; ++i)
+        {
+            array[i] = T{};
+        }
+
+        count = newSize;
+    }
+
     void clear()
     {
         count = 0;
@@ -130,24 +161,44 @@ class Array
         return data;
     }
 
-    Iterator begin() const
+    Iterator begin()
     {
         return Iterator(array.get());
     }
 
-    Iterator end() const
+    Iterator end()
     {
         return Iterator(array.get() + count);
     }
 
-    Iterator rbegin() const
+    Iterator rbegin()
     {
         return Iterator(array.get() + count - 1);
     }
 
-    Iterator rend() const
+    Iterator rend()
     {
         return Iterator(array.get() - 1);
+    }
+
+    ConstIterator cbegin() const
+    {
+        return ConstIterator(array.get());
+    }
+
+    ConstIterator cend() const
+    {
+        return ConstIterator(array.get() + count);
+    }
+
+    ConstIterator crbegin() const
+    {
+        return ConstIterator(array.get() + count - 1);
+    }
+
+    ConstIterator crend() const
+    {
+        return ConstIterator(array.get() - 1);
     }
 
   private:
@@ -161,11 +212,11 @@ template <typename T>
 class Array<T>::Iterator
 {
   public:
-    const T& operator*() const
+    T& operator*() const
     {
         return *data;
     }
-    const T* operator->() const
+    T* operator->() const
     {
         return data;
     }
@@ -202,6 +253,59 @@ class Array<T>::Iterator
 
   private:
     explicit Iterator(T* iData) : data(iData)
+    {
+    }
+
+    T* data;
+
+    friend class Array;
+};
+
+template <typename T>
+class Array<T>::ConstIterator
+{
+  public:
+    const T& operator*() const
+    {
+        return *data;
+    }
+    const T* operator->() const
+    {
+        return data;
+    }
+    bool operator==(const ConstIterator& other) const
+    {
+        return data == other.data;
+    }
+    bool operator!=(const ConstIterator& other) const
+    {
+        return data != other.data;
+    }
+    ConstIterator& operator++()
+    {
+        data++;
+        return *this;
+    }
+    ConstIterator operator++(int)
+    {
+        ConstIterator tmp(*this);
+        ++(*this);
+        return tmp;
+    }
+    ConstIterator& operator--()
+    {
+        data--;
+        return *this;
+    }
+    ConstIterator operator--(int)
+    {
+        ConstIterator tmp(*this);
+        --(*this);
+        return tmp;
+    }
+
+  private:
+    explicit ConstIterator(T* iData) : data(iData)
     {
     }
 
