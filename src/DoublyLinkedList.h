@@ -161,6 +161,43 @@ class DoublyLinkedList
         return tail->data;
     }
 
+    void erase(const Iterator& itToDelete)
+    {
+        if (itToDelete.currentNode == nullptr)
+        {
+            return;
+        }
+
+        Node* prev = itToDelete.currentNode->prev;
+        std::unique_ptr<Node> nodeToDelete = std::move(prev != nullptr ? prev->next : head);
+
+        if (prev == nullptr)
+        {
+            head = std::move(nodeToDelete->next);
+            if (!head)
+            {
+                tail = nullptr;
+            }
+            else
+            {
+                head->prev = nullptr;
+            }
+            return;
+        }
+
+        prev->next = std::move(nodeToDelete->next);
+        Node* next = prev->next.get();
+
+        if (next != nullptr)
+        {
+            next->prev = prev;
+        }
+        else
+        {
+            tail = prev;
+        }
+    }
+
     Iterator begin() const
     {
         return Iterator(head.get());

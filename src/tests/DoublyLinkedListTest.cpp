@@ -196,6 +196,29 @@ TEST_F(DoublyLinkedListTest, IsEmpty_WhenListHasElements_ShouldReturnFalse)
     EXPECT_FALSE(list.isEmpty());
 }
 
+TEST_F(DoublyLinkedListTest, Erase_WhenSingleElement_ShouldEmptyList)
+{
+    list.pushFront(0);
+    auto it = list.begin();
+    list.erase(it);
+
+    EXPECT_TRUE(list.isEmpty());
+}
+
+TEST_F(DoublyLinkedListTest, Erase_WhenListHasElements_ShouldEraseRightElement)
+{
+    list.pushFront(2);
+    list.pushFront(1);
+    list.pushFront(0);
+
+    auto it = list.begin();
+    ++it;
+    list.erase(it);
+
+    EXPECT_EQ(list.popFront(), 0);
+    EXPECT_EQ(list.popFront(), 2);
+}
+
 // --- Iterator Behavior ---
 TEST_F(DoublyLinkedListTest, Begin_WhenListIsEmpty_ShouldEqualEnd)
 {
