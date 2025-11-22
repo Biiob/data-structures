@@ -11,12 +11,13 @@ class DoublyLinkedList
 {
   public:
     class Iterator;
+    class ConstIterator;
 
     DoublyLinkedList() = default;
 
     DoublyLinkedList(const DoublyLinkedList<T>& other)
     {
-        for (auto it = other.begin(); it != other.end(); ++it)
+        for (auto it = other.cbegin(); it != other.cend(); ++it)
         {
             pushBack(*it);
         }
@@ -33,7 +34,7 @@ class DoublyLinkedList
         if (this != &other)
         {
             clear();
-            for (auto it = other.begin(); it != other.end(); ++it)
+            for (auto it = other.cbegin(); it != other.cend(); ++it)
             {
                 pushBack(*it);
             }
@@ -161,7 +162,7 @@ class DoublyLinkedList
         return tail->data;
     }
 
-    void erase(const Iterator& itToDelete)
+    void erase(Iterator& itToDelete)
     {
         if (itToDelete.currentNode == nullptr)
         {
@@ -198,24 +199,44 @@ class DoublyLinkedList
         }
     }
 
-    Iterator begin() const
+    Iterator begin()
     {
         return Iterator(head.get());
     }
 
-    Iterator end() const
+    Iterator end()
     {
         return Iterator(nullptr);
     }
 
-    Iterator rbegin() const
+    Iterator rbegin()
     {
         return Iterator(tail);
     }
 
-    Iterator rend() const
+    Iterator rend()
     {
         return Iterator(nullptr);
+    }
+
+    ConstIterator cbegin() const
+    {
+        return ConstIterator(head.get());
+    }
+
+    ConstIterator cend() const
+    {
+        return ConstIterator(nullptr);
+    }
+
+    ConstIterator crbegin() const
+    {
+        return ConstIterator(tail);
+    }
+
+    ConstIterator crend() const
+    {
+        return ConstIterator(nullptr);
     }
 
   private:
@@ -240,11 +261,11 @@ template <typename T>
 class DoublyLinkedList<T>::Iterator
 {
   public:
-    const T& operator*() const
+    T& operator*()
     {
         return currentNode->data;
     }
-    const T* operator->() const
+    T* operator->()
     {
         return &currentNode->data;
     }
@@ -281,6 +302,59 @@ class DoublyLinkedList<T>::Iterator
 
   private:
     explicit Iterator(Node* node) : currentNode(node)
+    {
+    }
+
+    Node* currentNode;
+
+    friend class DoublyLinkedList;
+};
+
+template <typename T>
+class DoublyLinkedList<T>::ConstIterator
+{
+  public:
+    const T& operator*() const
+    {
+        return currentNode->data;
+    }
+    const T* operator->() const
+    {
+        return &currentNode->data;
+    }
+    bool operator==(const ConstIterator& other) const
+    {
+        return currentNode == other.currentNode;
+    }
+    bool operator!=(const ConstIterator& other) const
+    {
+        return currentNode != other.currentNode;
+    }
+    ConstIterator& operator++()
+    {
+        currentNode = currentNode->next.get();
+        return *this;
+    }
+    ConstIterator operator++(int)
+    {
+        ConstIterator tmp(*this);
+        ++(*this);
+        return tmp;
+    }
+    ConstIterator& operator--()
+    {
+        currentNode = currentNode->prev;
+        return *this;
+    }
+    ConstIterator operator--(int)
+    {
+        ConstIterator tmp(*this);
+        --(*this);
+        return tmp;
+    }
+
+  private:
+    explicit ConstIterator(Node* node) : currentNode(node)
     {
     }
 
