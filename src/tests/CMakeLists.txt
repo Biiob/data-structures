@@ -9,7 +9,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(DataStructure_test LinkedListTest.cpp ArrayTest.cpp StackTest.cpp DoublyLinkedListTest.cpp)
+add_executable(DataStructure_test LinkedListTest.cpp ArrayTest.cpp StackTest.cpp DoublyLinkedListTest.cpp HashMapTest.cpp)
 target_link_libraries(DataStructure_test
     PRIVATE
         DataStructure
