@@ -4,3 +4,6 @@
 # Output
 bin/
 build/
+
+# User configuration
+.clangd
